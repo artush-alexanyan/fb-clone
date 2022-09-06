@@ -1,28 +1,61 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <v-app class="app">
+    <v-app-bar
+      app
+      color="primary"
+      dark
+      v-show="userIslogged"
+    >
+
+    <v-tabs>
+      <v-tab to="/">Login</v-tab>
+      <v-tab to="/dashboard">Dashboard</v-tab>
+    </v-tabs>
+
+    <div v-show="userIslogged">
+      <FbSignOut />
+    </div>
+
+    </v-app-bar>
+
+    <v-main>
+     <router-view></router-view>
+    </v-main>
+  </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Authentication from './plugins/firebase'
+import FbSignOut from './components/auth/FbSignOut.vue'
 
 export default {
   name: 'App',
+
   components: {
-    HelloWorld
+    FbSignOut
+  },
+
+  data: () => ({
+    userIslogged: false
+  }),
+
+  created () {
+    Authentication.auth().onAuthStateChanged(user => {
+      if(user) {
+        this.userIslogged = true
+        console.log("Current user  ",user)
+      }
+      else{
+        this.userIslogged = false
+        console.log("User not found")
+      }
+    })
   }
-}
+};
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+<style scoped>
+.app{
+    background-color: rgb(240,242,245) !important;
 }
 </style>
